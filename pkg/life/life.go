@@ -148,7 +148,7 @@ func (l *Life) saveState(context app.Context) {
 	path := context.Page.URL().Path
 	var prefix string
 	if strings.HasPrefix(path, "/gameoflife") {
-		prefix = "/gameoflife"
+		prefix = "/gameoflife/"
 	} else {
 		prefix = "/"
 	}

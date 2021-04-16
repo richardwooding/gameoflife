@@ -9,6 +9,7 @@ import (
 	"github.com/enescakir/emoji"
 	"github.com/maxence-charriere/go-app/v8/pkg/app"
 	"net/url"
+	"strings"
 	"time"
 )
 
@@ -112,23 +113,28 @@ func (l *Life) stopTicking(ctx app.Context) {
 
 func (l *Life) OnNav(ctx app.Context) {
 	path := ctx.Page.URL().Path
-	if path != "/" {
-		l.loadState(path[1:])
+	if path != "/" && path != "/gameoflife/"{
+		l.loadState(strings.TrimPrefix(path, "/gameoflife")[1:])
 	}
 }
 
 func (l *Life) loadState(state string) {
 	exp := &exported{}
-	b, _ := base64.StdEncoding.DecodeString(state)
+	b, err := base64.StdEncoding.DecodeString(state)
+	if err != nil {
+		return
+	}
 	buff := bytes.NewBuffer(b)
 	reader := flate.NewReader(buff)
 
 	dec := gob.NewDecoder(reader)
-	_ = dec.Decode(exp)
-	l.dy = len((*exp).Colony)
-	l.dx = len((*exp).Colony[0])
-	l.colony = &(*exp).Colony
-	l.Update()
+	err = dec.Decode(exp)
+	if err == nil {
+		l.dy = len((*exp).Colony)
+		l.dx = len((*exp).Colony[0])
+		l.colony = &(*exp).Colony
+		l.Update()
+	}
 }
 
 func (l *Life) saveState(context app.Context) {
@@ -139,7 +145,14 @@ func (l *Life) saveState(context app.Context) {
 	_ = enc.Encode(exp)
 	_ = writer.Flush()
 	str := base64.StdEncoding.EncodeToString(buff.Bytes())
-	newUrl, _ := url.Parse(fmt.Sprintf("/%s",str))
+	path := context.Page.URL().Path
+	var prefix string
+	if strings.HasPrefix(path, "/gameoflife") {
+		prefix = "/gameoflife"
+	} else {
+		prefix = "/"
+	}
+	newUrl, _ := url.Parse(fmt.Sprintf("%s%s", prefix, str))
 	context.Page.ReplaceURL(context.Page.URL().ResolveReference(newUrl))
 }
 

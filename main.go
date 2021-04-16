@@ -32,6 +32,7 @@ func main() {
 	app.RunWhenOnBrowser()
 
 
+	/*
 		err := app.GenerateStaticWebsite("docs", &app.Handler{
 			Name:        "Conway's Game Of Life",
 			Description: "Conway's Game Of Lifer",
@@ -44,7 +45,7 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-
+	*/
 
 	// Finally, launching the server that serves the app is done by using the Go
 	// standard HTTP package.

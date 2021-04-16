@@ -17,7 +17,7 @@ func main() {
 	//
 	// This is done by calling the Route() function,  which tells go-app what
 	// component to display for a given path, on both client and server-side.
-	app.Route("/", &life.Life{})
+	app.RouteWithRegexp("^/.*", &life.Life{})
 
 	// Once the routes set up, the next thing to do is to either launch the app
 	// or the server that serves the app.
@@ -31,19 +31,19 @@ func main() {
 	// writing of server logic without needing precompiling instructions.
 	app.RunWhenOnBrowser()
 
-	/*
+
 		err := app.GenerateStaticWebsite("docs", &app.Handler{
-			Name:        "Trendy Calculator",
-			Description: "A trendy calculator",
+			Name:        "Conway's Game Of Life",
+			Description: "Conway's Game Of Lifer",
 			Styles: []string {
 				"/web/app.css",
 			},
-			Resources: app.GitHubPages("trendycalculator"),
+			Resources: app.GitHubPages("gameoflife"),
 		})
 
 		if err != nil {
 			log.Fatal(err)
-		}*/
+		}
 
 
 	// Finally, launching the server that serves the app is done by using the Go

@@ -1,8 +1,14 @@
 package life
 
 import (
+	"bytes"
+	"compress/flate"
+	"encoding/base64"
+	"encoding/gob"
+	"fmt"
 	"github.com/enescakir/emoji"
 	"github.com/maxence-charriere/go-app/v8/pkg/app"
+	"net/url"
 	"time"
 )
 
@@ -16,7 +22,11 @@ type Life struct {
 	done	   chan bool
 }
 
-func (l *Life) newColony(dx uint, dy uint) {
+type exported struct {
+	Colony [][]bool
+}
+
+func (l *Life) newColony(context app.Context, dx uint, dy uint) {
 	c := make([][]bool, dy)
 	for i := range c {
 		c[i] = make([]bool, dx)
@@ -25,6 +35,7 @@ func (l *Life) newColony(dx uint, dy uint) {
 	l.dx = int(dx)
 	l.dy = int(dy)
 	l.colony = &c
+	l.saveState(context)
 	l.Update()
 }
 
@@ -61,18 +72,9 @@ func (l *Life) generate() {
 	l.Update()
 }
 
-func (l *Life) alive(x int, y int) {
-	(*l.colony)[y][x] = true
-	l.Update()
-}
-
-func (l *Life) dead(x int, y int) {
-	(*l.colony)[y][x] = false
-	l.Update()
-}
-
-func (l *Life) toggle(x int, y int) {
+func (l *Life) toggle(context app.Context, x int, y int) {
 	(*l.colony)[y][x] = !(*l.colony)[y][x]
+	l.saveState(context)
 	l.Update()
 }
 
@@ -101,10 +103,44 @@ func (l *Life) startTicking(ctx app.Context) {
 	})
 }
 
-func (l *Life) stopTicking() {
+func (l *Life) stopTicking(ctx app.Context) {
 	l.ticker.Stop()
 	l.ticker = nil
+	l.saveState(ctx)
 	l.Update()
+}
+
+func (l *Life) OnNav(ctx app.Context) {
+	path := ctx.Page.URL().Path
+	if path != "/" {
+		l.loadState(path[1:])
+	}
+}
+
+func (l *Life) loadState(state string) {
+	exp := &exported{}
+	b, _ := base64.StdEncoding.DecodeString(state)
+	buff := bytes.NewBuffer(b)
+	reader := flate.NewReader(buff)
+
+	dec := gob.NewDecoder(reader)
+	_ = dec.Decode(exp)
+	l.dy = len((*exp).Colony)
+	l.dx = len((*exp).Colony[0])
+	l.colony = &(*exp).Colony
+	l.Update()
+}
+
+func (l *Life) saveState(context app.Context) {
+	exp := exported{Colony: *l.colony}
+	var buff bytes.Buffer
+	writer, _ := flate.NewWriter(&buff, flate.BestCompression)
+	enc := gob.NewEncoder(writer)
+	_ = enc.Encode(exp)
+	_ = writer.Flush()
+	str := base64.StdEncoding.EncodeToString(buff.Bytes())
+	newUrl, _ := url.Parse(fmt.Sprintf("/%s",str))
+	context.Page.ReplaceURL(context.Page.URL().ResolveReference(newUrl))
 }
 
 func (l *Life) Render() app.UI {
@@ -120,7 +156,7 @@ func (l *Life) Render() app.UI {
 		app.H1().Text("Game of life"),
 		app.If(l.colony == nil,
 			app.Button().Text("Make Colony").OnClick(func(ctx app.Context, e app.Event) {
-				l.newColony(64, 64)
+				l.newColony(ctx, 64, 64)
 			}),
 		).Else(
 			app.If(l.ticker == nil,
@@ -129,7 +165,7 @@ func (l *Life) Render() app.UI {
 				}),
 			).Else(
 				app.Button().Text(emoji.PauseButton).OnClick(func(ctx app.Context, e app.Event) {
-					l.stopTicking()
+					l.stopTicking(ctx)
 				}),
 			),
 			app.Hr(),
@@ -138,7 +174,7 @@ func (l *Life) Render() app.UI {
 					return app.Range(colony[y]).Slice(func(x int) app.UI {
 						return app.Div().Class(l.className(x, y)).OnClick(func(ctx app.Context, e app.Event) {
 							if l.ticker == nil {
-								l.toggle(x, y)
+								l.toggle(ctx, x, y)
 							}
 						})
 					})

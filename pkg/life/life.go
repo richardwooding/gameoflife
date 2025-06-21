@@ -462,6 +462,11 @@ func (l *Life) Render() app.UI {
 						l.insertRandom(ctx)
 					}
 				}),
+				app.Button().Textf("%s Center", emoji.Compass).OnClick(func(ctx app.Context, e app.Event) {
+					if l.colony != nil && l.ticker == nil {
+						l.centerAlive(ctx)
+					}
+				}),
 			)
 		}),
 		app.Hr(),
@@ -490,4 +495,58 @@ func (l *Life) insertRandom(ctx app.Context) {
 	}
 	l.generation = 0
 	l.saveState(ctx)
+}
+
+// centerAlive shifts the bounding box of alive cells to the center of the grid.
+func (l *Life) centerAlive(ctx app.Context) {
+	if l.colony == nil {
+		return
+	}
+	minX, minY, maxX, maxY := l.dx, l.dy, 0, 0
+	found := false
+	for y := 0; y < l.dy; y++ {
+		for x := 0; x < l.dx; x++ {
+			if (*l.colony)[y][x] {
+				if x < minX {
+					minX = x
+				}
+				if y < minY {
+					minY = y
+				}
+				if x > maxX {
+					maxX = x
+				}
+				if y > maxY {
+					maxY = y
+				}
+				found = true
+			}
+		}
+	}
+	if !found {
+		return
+	}
+	w, h := maxX-minX+1, maxY-minY+1
+	dx := (l.dx-w)/2 - minX
+	dy := (l.dy-h)/2 - minY
+	if dx == 0 && dy == 0 {
+		return
+	}
+	newColony := make([][]bool, l.dy)
+	for y := range newColony {
+		newColony[y] = make([]bool, l.dx)
+	}
+	for y := minY; y <= maxY; y++ {
+		for x := minX; x <= maxX; x++ {
+			if (*l.colony)[y][x] {
+				nx, ny := x+dx, y+dy
+				if nx >= 0 && nx < l.dx && ny >= 0 && ny < l.dy {
+					newColony[ny][nx] = true
+				}
+			}
+		}
+	}
+	l.colony = &newColony
+	l.saveState(ctx)
+	ctx.Update()
 }

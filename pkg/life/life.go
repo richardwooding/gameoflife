@@ -13,6 +13,16 @@ import (
 	"time"
 )
 
+// Grid size constants
+const (
+	GridWidth  = 64
+	GridHeight = 64
+
+	SurviveMin = 2 // Minimum neighbors for survival
+	SurviveMax = 3 // Maximum neighbors for survival
+	Birth      = 3 // Exact neighbors for birth
+)
+
 type Life struct {
 	app.Compo
 	generation int64
@@ -64,7 +74,7 @@ func (l *Life) generate(ctx app.Context) {
 		for y := 0; y < l.dy; y++ {
 			alive := (*l.colony)[y][x]
 			neighbours := l.countNeighbours(x, y)
-			ng[y][x] = (alive && (neighbours == 2 || neighbours == 3)) || (!alive && neighbours == 3)
+			ng[y][x] = (alive && (neighbours == SurviveMin || neighbours == SurviveMax)) || (!alive && neighbours == Birth)
 		}
 	}
 	l.generation++
@@ -200,7 +210,7 @@ func (l *Life) Render() app.UI {
 		app.If(l.colony == nil,
 			func() app.UI {
 				return app.Button().Text("Make Colony").OnClick(func(ctx app.Context, e app.Event) {
-					l.newColony(ctx, 64, 64)
+					l.newColony(ctx, GridWidth, GridHeight)
 				})
 			}).Else(func() app.UI {
 			return app.Div().Body(

@@ -49,8 +49,10 @@ Then open [http://localhost:8000](http://localhost:8000) in your browser.
 
 ### Modifying the Grid Size
 
-To change the grid size, update the parameters in `l.newColony(ctx, 64, 64)` in `pkg/life/life.go`.
+The grid size is set using the `GridWidth` and `GridHeight` constants in `pkg/life/life.go`.  
+If you change these, also update the CSS grid in `web/gameoflife.css` for correct display.
 
 ## License
 
 MIT License. See [LICENSE](LICENSE) for details.
+

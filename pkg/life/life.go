@@ -372,10 +372,13 @@ func (l *Life) Render() app.UI {
 	}
 
 	return app.Div().Body(
-		app.H1().Text("Game of life"),
+		app.H1().Text("Conway's Game of life"),
+		app.Button().Textf("%s Open on Github", emoji.Laptop).OnClick(func(ctx app.Context, e app.Event) {
+			ctx.Navigate("https://github.com/richardwooding/gameoflife")
+		}),
 		app.If(l.colony == nil,
 			func() app.UI {
-				return app.Button().Text("Make Colony").OnClick(func(ctx app.Context, e app.Event) {
+				return app.Button().Textf("%s Make Colony", emoji.Hut).OnClick(func(ctx app.Context, e app.Event) {
 					l.newColony(ctx, 64, 64)
 					l.tickInterval = 50 * time.Millisecond
 				})

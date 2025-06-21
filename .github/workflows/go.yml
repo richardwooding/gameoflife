@@ -27,7 +27,7 @@ jobs:
         GOOS=js GOARCH=wasm go build -o web/app.wasm
 
     - name: Build
-      run: go build -v ./... -o gameoflife
+      run: go build -o gameoflife -v ./...
 
     - name: Test
       run: go test -v ./...

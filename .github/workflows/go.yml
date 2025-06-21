@@ -21,8 +21,22 @@ jobs:
       with:
         go-version: '1.24'
 
+    - name: Build WASM
+      run: |
+        mkdir -p web
+        GOOS=js GOARCH=wasm go build -o web/app.wasm
+
     - name: Build
       run: go build -v ./...
 
     - name: Test
       run: go test -v ./...
+
+    - name: Copy static files
+      run: CONWAYS_GAME_OF_LIFE_WEB_MODE=static ./gameoflife
+
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v4
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./web

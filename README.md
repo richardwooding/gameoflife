@@ -54,5 +54,4 @@ If you change these, also update the CSS grid in `web/gameoflife.css` for correc
 
 ## License
 
-MIT License. See [LICENSE](LICENSE) for details.
-
+This project is licensed under the Apache License 2.0. See the [LICENSE](LICENSE) file for details.

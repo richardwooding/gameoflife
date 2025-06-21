@@ -31,6 +31,9 @@ func main() {
 	handler := &app.Handler{
 		Name:        "Conway's Game of Life",
 		Description: "A live demo of Conway's Game of Life.",
+		Icon: app.Icon{
+			Default: "/web/logo.png",
+		},
 		Styles: []string{
 			"/web/gameoflife.css",
 		},

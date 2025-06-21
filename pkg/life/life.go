@@ -166,6 +166,26 @@ func (l *Life) clearColony(ctx app.Context) {
 	l.saveState(ctx)
 }
 
+func (l *Life) insertGlider(ctx app.Context) {
+	if l.colony == nil || l.dx < 3 || l.dy < 3 {
+		return
+	}
+	// Clear a 3x3 area at the top-left
+	for y := 0; y < 3; y++ {
+		for x := 0; x < 3; x++ {
+			(*l.colony)[y][x] = false
+		}
+	}
+	// Set glider pattern
+	(*l.colony)[0][1] = true
+	(*l.colony)[1][2] = true
+	(*l.colony)[2][0] = true
+	(*l.colony)[2][1] = true
+	(*l.colony)[2][2] = true
+	l.saveState(ctx)
+	ctx.Update()
+}
+
 func (l *Life) Render() app.UI {
 
 	var colony [][]bool
@@ -197,6 +217,11 @@ func (l *Life) Render() app.UI {
 				app.Button().Text(emoji.ClButton).OnClick(func(ctx app.Context, e app.Event) {
 					if l.ticker == nil {
 						l.clearColony(ctx)
+					}
+				}),
+				app.Button().Textf("%s Glider", emoji.Plus).OnClick(func(ctx app.Context, e app.Event) {
+					if l.ticker == nil {
+						l.insertGlider(ctx)
 					}
 				}),
 			)

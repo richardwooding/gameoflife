@@ -120,6 +120,13 @@ func (l *Life) OnNav(ctx app.Context) {
 	}
 }
 
+func (l *Life) OnMount(ctx app.Context) {
+	fragment := ctx.Page().URL().Fragment
+	if fragment != "" {
+		l.loadState(fragment)
+	}
+}
+
 func (l *Life) loadState(state string) {
 	exp := &exported{}
 	b, err := base64.RawURLEncoding.DecodeString(state)
@@ -148,7 +155,6 @@ func (l *Life) saveState(context app.Context) {
 	_ = enc.Encode(exp)
 	_ = writer.Flush()
 	str := base64.RawURLEncoding.EncodeToString(buff.Bytes())
-	println("Saving state", str)
 	path := context.Page().URL().Path
 	var prefix string
 	if strings.HasPrefix(path, "/gameoflife") {
@@ -156,7 +162,7 @@ func (l *Life) saveState(context app.Context) {
 	} else {
 		prefix = "/"
 	}
-	newUrl, _ := url.Parse(fmt.Sprintf("%s%s", prefix, str))
+	newUrl, _ := url.Parse(fmt.Sprintf("%s#%s", prefix, str))
 	context.Page().ReplaceURL(context.Page().URL().ResolveReference(newUrl))
 }
 

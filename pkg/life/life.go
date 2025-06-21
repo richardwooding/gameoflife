@@ -193,6 +193,133 @@ func (l *Life) insertGlider(ctx app.Context) {
 	ctx.Update()
 }
 
+func (l *Life) insertBlinker(ctx app.Context) {
+	if l.colony == nil || l.dx < 5 || l.dy < 5 {
+		return
+	}
+	// Place blinker at (2,2) horizontally, clear a 5x1 area at y=2
+	for i := 0; i < 5; i++ {
+		(*l.colony)[2][i] = false
+	}
+	// Set blinker pattern at (2,2)-(4,2)
+	(*l.colony)[2][2] = true
+	(*l.colony)[2][3] = true
+	(*l.colony)[2][4] = true
+	l.saveState(ctx)
+	ctx.Update()
+}
+
+func (l *Life) insertPulsar(ctx app.Context) {
+	if l.colony == nil || l.dx < 9 || l.dy < 9 {
+		return
+	}
+	// Place pulsar at (2,2), clear a 7x7 area at (2,2)
+	for y := 2; y < 9; y++ {
+		for x := 2; x < 9; x++ {
+			(*l.colony)[y][x] = false
+		}
+	}
+	// Set pulsar pattern at (2,2)
+	(*l.colony)[3][7] = true
+	(*l.colony)[4][7] = true
+	(*l.colony)[5][7] = true
+	(*l.colony)[6][7] = true
+	(*l.colony)[7][7] = true
+	(*l.colony)[8][7] = true
+	(*l.colony)[7][3] = true
+	(*l.colony)[7][4] = true
+	(*l.colony)[7][5] = true
+	(*l.colony)[7][6] = true
+	(*l.colony)[7][8] = true
+	(*l.colony)[7][9] = true
+	l.saveState(ctx)
+	ctx.Update()
+}
+
+func (l *Life) insertToad(ctx app.Context) {
+	if l.colony == nil || l.dx < 6 || l.dy < 6 {
+		return
+	}
+	for y := 2; y < 5; y++ {
+		for x := 2; x < 6; x++ {
+			(*l.colony)[y][x] = false
+		}
+	}
+	(*l.colony)[2][3] = true
+	(*l.colony)[2][4] = true
+	(*l.colony)[2][5] = true
+	(*l.colony)[3][2] = true
+	(*l.colony)[3][3] = true
+	(*l.colony)[3][4] = true
+	l.saveState(ctx)
+	ctx.Update()
+}
+
+func (l *Life) insertBeacon(ctx app.Context) {
+	if l.colony == nil || l.dx < 6 || l.dy < 6 {
+		return
+	}
+	for y := 2; y < 6; y++ {
+		for x := 2; x < 6; x++ {
+			(*l.colony)[y][x] = false
+		}
+	}
+	(*l.colony)[2][2] = true
+	(*l.colony)[2][3] = true
+	(*l.colony)[3][2] = true
+	(*l.colony)[3][3] = true
+	(*l.colony)[4][4] = true
+	(*l.colony)[4][5] = true
+	(*l.colony)[5][4] = true
+	(*l.colony)[5][5] = true
+	l.saveState(ctx)
+	ctx.Update()
+}
+
+func (l *Life) insertAcorn(ctx app.Context) {
+	if l.colony == nil || l.dx < 10 || l.dy < 10 {
+		return
+	}
+	for y := 2; y < 5; y++ {
+		for x := 2; x < 9; x++ {
+			(*l.colony)[y][x] = false
+		}
+	}
+	(*l.colony)[3][3] = true
+	(*l.colony)[4][5] = true
+	(*l.colony)[2][4] = true
+	(*l.colony)[3][5] = true
+	(*l.colony)[3][6] = true
+	(*l.colony)[3][7] = true
+	(*l.colony)[3][8] = true
+	l.saveState(ctx)
+	ctx.Update()
+}
+
+func (l *Life) insertGosperGliderGun(ctx app.Context) {
+	if l.colony == nil || l.dx < 40 || l.dy < 11 {
+		return
+	}
+	for y := 2; y < 11; y++ {
+		for x := 2; x < 39; x++ {
+			(*l.colony)[y][x] = false
+		}
+	}
+	// Set Gosper Glider Gun pattern (relative to (2,2))
+	cells := [][2]int{
+		{2, 6}, {2, 7}, {3, 6}, {3, 7},
+		{12, 6}, {12, 7}, {12, 8}, {13, 5}, {13, 9}, {14, 4}, {14, 10}, {15, 4}, {15, 10}, {16, 7},
+		{17, 5}, {17, 9}, {18, 6}, {18, 7}, {18, 8}, {19, 7},
+		{22, 4}, {22, 5}, {22, 6}, {23, 4}, {23, 5}, {23, 6}, {24, 3}, {24, 7}, {26, 2}, {26, 3}, {26, 7}, {26, 8},
+		{36, 4}, {36, 5}, {37, 4}, {37, 5},
+	}
+	for _, c := range cells {
+		(*l.colony)[c[1]][c[0]] = true
+	}
+	l.saveState(ctx)
+	ctx.Update()
+}
+
 func (l *Life) setSpeed(ctx app.Context, ms int64) {
 	println("Setting speed to", ms, "ms")
 	if ms < 10 {
@@ -267,6 +394,36 @@ func (l *Life) Render() app.UI {
 				app.Button().Textf("%s Glider", emoji.Plus).OnClick(func(ctx app.Context, e app.Event) {
 					if l.ticker == nil {
 						l.insertGlider(ctx)
+					}
+				}),
+				app.Button().Textf("%s Blinker", emoji.Plus).OnClick(func(ctx app.Context, e app.Event) {
+					if l.ticker == nil {
+						l.insertBlinker(ctx)
+					}
+				}),
+				app.Button().Textf("%s Pulsar", emoji.Plus).OnClick(func(ctx app.Context, e app.Event) {
+					if l.ticker == nil {
+						l.insertPulsar(ctx)
+					}
+				}),
+				app.Button().Textf("%s Toad", emoji.Plus).OnClick(func(ctx app.Context, e app.Event) {
+					if l.ticker == nil {
+						l.insertToad(ctx)
+					}
+				}),
+				app.Button().Textf("%s Beacon", emoji.Plus).OnClick(func(ctx app.Context, e app.Event) {
+					if l.ticker == nil {
+						l.insertBeacon(ctx)
+					}
+				}),
+				app.Button().Textf("%s Acorn", emoji.Plus).OnClick(func(ctx app.Context, e app.Event) {
+					if l.ticker == nil {
+						l.insertAcorn(ctx)
+					}
+				}),
+				app.Button().Textf("%s Gosper Glider Gun", emoji.Plus).OnClick(func(ctx app.Context, e app.Event) {
+					if l.ticker == nil {
+						l.insertGosperGliderGun(ctx)
 					}
 				}),
 			)

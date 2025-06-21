@@ -45,7 +45,7 @@ func main() {
 			log.Fatal(err)
 		}
 	case webmode.Static:
-		if err := app.GenerateStaticWebsite(".", handler); err != nil {
+		if err := app.GenerateStaticWebsite("dist", handler); err != nil {
 			log.Fatal(err)
 		}
 	}

@@ -36,9 +36,10 @@ jobs:
       run: |
         go build
         CONWAYS_GAME_OF_LIFE_WEB_MODE=static ./gameoflife
+        cp -r web/* ./dist/web/
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v4
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./web
+        publish_dir: ./dist

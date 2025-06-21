@@ -153,6 +153,19 @@ func (l *Life) saveState(context app.Context) {
 	context.Page().ReplaceURL(context.Page().URL().ResolveReference(newUrl))
 }
 
+func (l *Life) clearColony(ctx app.Context) {
+	if l.colony == nil {
+		return
+	}
+	for y := 0; y < l.dy; y++ {
+		for x := 0; x < l.dx; x++ {
+			(*l.colony)[y][x] = false
+		}
+	}
+	l.generation = 0
+	l.saveState(ctx)
+}
+
 func (l *Life) Render() app.UI {
 
 	var colony [][]bool
@@ -170,31 +183,24 @@ func (l *Life) Render() app.UI {
 					l.newColony(ctx, 64, 64)
 				})
 			}).Else(func() app.UI {
-			return app.If(l.ticker == nil,
-				func() app.UI {
-					return app.Button().Text(emoji.PlayButton).OnClick(func(ctx app.Context, e app.Event) {
-						l.startTicking(ctx)
-					})
-				}).Else(func() app.UI {
-				return app.Button().Text(emoji.PauseButton).OnClick(func(ctx app.Context, e app.Event) {
-					l.stopTicking(ctx)
-				})
-			})
-		}).Else(
-			func() app.UI {
-				return app.If(l.ticker == nil,
+			return app.Div().Body(
+				app.If(l.ticker == nil,
 					func() app.UI {
 						return app.Button().Text(emoji.PlayButton).OnClick(func(ctx app.Context, e app.Event) {
 							l.startTicking(ctx)
 						})
-					}).Else(
-					func() app.UI {
-						return app.Button().Text(emoji.PauseButton).OnClick(func(ctx app.Context, e app.Event) {
-							l.stopTicking(ctx)
-						})
+					}).Else(func() app.UI {
+					return app.Button().Text(emoji.PauseButton).OnClick(func(ctx app.Context, e app.Event) {
+						l.stopTicking(ctx)
 					})
-
-			}),
+				}),
+				app.Button().Text(emoji.ClButton).OnClick(func(ctx app.Context, e app.Event) {
+					if l.ticker == nil {
+						l.clearColony(ctx)
+					}
+				}),
+			)
+		}),
 		app.Hr(),
 		app.Div().Textf("Generation: %d", l.generation),
 		app.Div().Class("wrapper").Body(

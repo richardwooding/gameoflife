@@ -10,3 +10,4 @@
 - CSS is in `web/gameoflife.css` and controls the appearance of the grid and cells.
 - Do not introduce external dependencies unless necessary.
 - Keep code concise and readable.
+- Tests should use gherkin syntax with godog for BDD-style testing.

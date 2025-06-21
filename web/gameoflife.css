@@ -1,5 +1,6 @@
 .wrapper {
     height: 100%;
+    display: grid;
     grid-template: repeat(64, 17px) / repeat(64, 17px);
     grid-gap: 3px;
 }

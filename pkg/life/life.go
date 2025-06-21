@@ -7,7 +7,7 @@ import (
 	"encoding/gob"
 	"fmt"
 	"github.com/enescakir/emoji"
-	"github.com/maxence-charriere/go-app/v8/pkg/app"
+	"github.com/maxence-charriere/go-app/v10/pkg/app"
 	"net/url"
 	"strings"
 	"time"
@@ -20,7 +20,7 @@ type Life struct {
 	dy         int
 	colony     *[][]bool
 	ticker     *time.Ticker
-	done	   chan bool
+	done       chan bool
 }
 
 type exported struct {
@@ -37,7 +37,6 @@ func (l *Life) newColony(context app.Context, dx uint, dy uint) {
 	l.dy = int(dy)
 	l.colony = &c
 	l.saveState(context)
-	l.Update()
 }
 
 func (l *Life) count(x int, y int) uint {
@@ -56,7 +55,7 @@ func (l *Life) countNeighbours(x int, y int) uint {
 		l.count(x-1, y+1) + l.count(x, y+1) + l.count(x+1, y+1)
 }
 
-func (l *Life) generate() {
+func (l *Life) generate(ctx app.Context) {
 	ng := make([][]bool, l.dy)
 	for i := range ng {
 		ng[i] = make([]bool, l.dx)
@@ -70,13 +69,13 @@ func (l *Life) generate() {
 	}
 	l.generation++
 	l.colony = &ng
-	l.Update()
+	ctx.Update()
 }
 
 func (l *Life) toggle(context app.Context, x int, y int) {
 	(*l.colony)[y][x] = !(*l.colony)[y][x]
 	l.saveState(context)
-	l.Update()
+	//l.Update()
 }
 
 func (l *Life) className(x int, y int) string {
@@ -88,17 +87,15 @@ func (l *Life) className(x int, y int) string {
 }
 
 func (l *Life) startTicking(ctx app.Context) {
-	l.ticker = time.NewTicker(50*time.Millisecond)
+	l.ticker = time.NewTicker(50 * time.Millisecond)
 	l.done = make(chan bool)
 	ctx.Async(func() {
 		for {
 			select {
 			case <-l.done:
 				return
-			case <- l.ticker.C:
-				l.Defer(func(context app.Context) {
-					l.generate()
-				})
+			case <-l.ticker.C:
+				l.generate(ctx)
 			}
 		}
 	})
@@ -108,19 +105,18 @@ func (l *Life) stopTicking(ctx app.Context) {
 	l.ticker.Stop()
 	l.ticker = nil
 	l.saveState(ctx)
-	l.Update()
 }
 
 func (l *Life) OnNav(ctx app.Context) {
-	path := ctx.Page.URL().Path
-	if path != "/" && path != "/gameoflife/"{
+	path := ctx.Page().URL().Path
+	if path != "/" && path != "/gameoflife/" {
 		l.loadState(strings.TrimPrefix(path, "/gameoflife")[1:])
 	}
 }
 
 func (l *Life) loadState(state string) {
 	exp := &exported{}
-	b, err := base64.StdEncoding.DecodeString(state)
+	b, err := base64.RawURLEncoding.DecodeString(state)
 	if err != nil {
 		return
 	}
@@ -133,7 +129,7 @@ func (l *Life) loadState(state string) {
 		l.dy = len((*exp).Colony)
 		l.dx = len((*exp).Colony[0])
 		l.colony = &(*exp).Colony
-		l.Update()
+		//l.Update()
 	}
 }
 
@@ -144,8 +140,9 @@ func (l *Life) saveState(context app.Context) {
 	enc := gob.NewEncoder(writer)
 	_ = enc.Encode(exp)
 	_ = writer.Flush()
-	str := base64.StdEncoding.EncodeToString(buff.Bytes())
-	path := context.Page.URL().Path
+	str := base64.RawURLEncoding.EncodeToString(buff.Bytes())
+	println("Saving state", str)
+	path := context.Page().URL().Path
 	var prefix string
 	if strings.HasPrefix(path, "/gameoflife") {
 		prefix = "/gameoflife/"
@@ -153,7 +150,7 @@ func (l *Life) saveState(context app.Context) {
 		prefix = "/"
 	}
 	newUrl, _ := url.Parse(fmt.Sprintf("%s%s", prefix, str))
-	context.Page.ReplaceURL(context.Page.URL().ResolveReference(newUrl))
+	context.Page().ReplaceURL(context.Page().URL().ResolveReference(newUrl))
 }
 
 func (l *Life) Render() app.UI {
@@ -168,31 +165,48 @@ func (l *Life) Render() app.UI {
 	return app.Div().Body(
 		app.H1().Text("Game of life"),
 		app.If(l.colony == nil,
-			app.Button().Text("Make Colony").OnClick(func(ctx app.Context, e app.Event) {
-				l.newColony(ctx, 64, 64)
-			}),
-		).Else(
-			app.If(l.ticker == nil,
-				app.Button().Text(emoji.PlayButton).OnClick(func(ctx app.Context, e app.Event) {
-					l.startTicking(ctx)
-				}),
-			).Else(
-				app.Button().Text(emoji.PauseButton).OnClick(func(ctx app.Context, e app.Event) {
+			func() app.UI {
+				return app.Button().Text("Make Colony").OnClick(func(ctx app.Context, e app.Event) {
+					l.newColony(ctx, 64, 64)
+				})
+			}).Else(func() app.UI {
+			return app.If(l.ticker == nil,
+				func() app.UI {
+					return app.Button().Text(emoji.PlayButton).OnClick(func(ctx app.Context, e app.Event) {
+						l.startTicking(ctx)
+					})
+				}).Else(func() app.UI {
+				return app.Button().Text(emoji.PauseButton).OnClick(func(ctx app.Context, e app.Event) {
 					l.stopTicking(ctx)
-				}),
-			),
-			app.Hr(),
-			app.Div().Class("wrapper").Body(
-				app.Range(colony).Slice(func(y int) app.UI {
-					return app.Range(colony[y]).Slice(func(x int) app.UI {
-						return app.Div().Class(l.className(x, y)).OnClick(func(ctx app.Context, e app.Event) {
-							if l.ticker == nil {
-								l.toggle(ctx, x, y)
-							}
+				})
+			})
+		}).Else(
+			func() app.UI {
+				return app.If(l.ticker == nil,
+					func() app.UI {
+						return app.Button().Text(emoji.PlayButton).OnClick(func(ctx app.Context, e app.Event) {
+							l.startTicking(ctx)
+						})
+					}).Else(
+					func() app.UI {
+						return app.Button().Text(emoji.PauseButton).OnClick(func(ctx app.Context, e app.Event) {
+							l.stopTicking(ctx)
 						})
 					})
-				}),
-			),
+
+			}),
+		app.Hr(),
+		app.Div().Textf("Generation: %d", l.generation),
+		app.Div().Class("wrapper").Body(
+			app.Range(colony).Slice(func(y int) app.UI {
+				return app.Range(colony[y]).Slice(func(x int) app.UI {
+					return app.Div().Class(l.className(x, y)).OnClick(func(ctx app.Context, e app.Event) {
+						if l.ticker == nil {
+							l.toggle(ctx, x, y)
+						}
+					})
+				})
+			}),
 		),
 	)
 }

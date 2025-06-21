@@ -45,6 +45,7 @@ func main() {
 			log.Fatal(err)
 		}
 	case webmode.Static:
+		handler.Resources = app.GitHubPages("gameoflife")
 		if err := app.GenerateStaticWebsite("dist", handler); err != nil {
 			log.Fatal(err)
 		}

@@ -18,3 +18,4 @@
 # vendor/
 web/app.wasm
 gameoflife
+dist/

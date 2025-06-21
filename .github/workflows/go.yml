@@ -41,6 +41,7 @@ jobs:
       run: |
         go build
         CONWAYS_GAME_OF_LIFE_WEB_MODE=static ./gameoflife
+        mkdir -p dist/web
         cp -r web/* ./dist/web/
 
     - name: Upload static files as artifact

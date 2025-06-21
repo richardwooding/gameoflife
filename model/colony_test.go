@@ -41,12 +41,33 @@ func (f *colonyFeature) theCellAtShouldBeState(x, y int, state string) error {
 	return nil
 }
 
+func (f *colonyFeature) toggleCellAt(x, y int) error {
+	if x < 0 || y < 0 || x >= f.colony.dx || y >= f.colony.dy {
+		return fmt.Errorf("cell (%d,%d) is out of bounds", x, y)
+	}
+	(*f.colony.cells)[y][x] = !(*f.colony.cells)[y][x]
+	return nil
+}
+
+func (f *colonyFeature) allCellsShouldBeDead() error {
+	for y := 0; y < f.colony.dy; y++ {
+		for x := 0; x < f.colony.dx; x++ {
+			if (*f.colony.cells)[y][x] {
+				return fmt.Errorf("cell (%d,%d) is alive, expected all cells to be dead", x, y)
+			}
+		}
+	}
+	return nil
+}
+
 func InitializeScenario(ctx *godog.ScenarioContext) {
 	f := &colonyFeature{}
 	ctx.Step(`^a (\d+)x(\d+) colony$`, f.aColonyOfSize)
 	ctx.Step(`^the cell at \((\d+),(\d+)\) is alive$`, f.theCellAtIsAlive)
 	ctx.Step(`^the next generation is computed$`, f.nextGenerationIsComputed)
 	ctx.Step(`^the cell at \((\d+),(\d+)\) should be (alive|dead)$`, f.theCellAtShouldBeState)
+	ctx.Step(`^I toggle the cell at \((\d+),(\d+)\)$`, f.toggleCellAt)
+	ctx.Step(`^all cells should be dead$`, f.allCellsShouldBeDead)
 }
 
 func TestColonyFeatures(t *testing.T) {

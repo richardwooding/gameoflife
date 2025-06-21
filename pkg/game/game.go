@@ -217,9 +217,9 @@ func (g *Game) Render() app.UI {
 						g.clearColony(ctx)
 					}
 				}),
-				app.Range(Features).Slice(func(i int) app.UI {
-					return app.Button().Textf("%s %s", emoji.Plus, Features[i].GetName()).OnClick(func(ctx app.Context, e app.Event) {
-						Features[i].Stamp(g.colony.Cells(), 2, 2)
+				app.Range(Patterns).Slice(func(i int) app.UI {
+					return app.Button().Textf("%s %s", emoji.Plus, Patterns[i].GetName()).OnClick(func(ctx app.Context, e app.Event) {
+						Patterns[i].Stamp(g.colony.Cells(), 2, 2)
 						g.saveState(ctx)
 					})
 				}),

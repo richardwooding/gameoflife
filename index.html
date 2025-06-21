@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="author" content>
+    <meta name="description" content="A live demo of Conway's Game of Life.">
+    <meta content="#2d2c2c" name="theme-color">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta property="og:url" content="https://">
+    <meta property="og:title" content>
+    <meta property="og:description" content="A live demo of Conway's Game of Life.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://">
+    <title></title>
+    <link rel="icon" href="https://raw.githubusercontent.com/maxence-charriere/go-app/master/docs/web/icon.svg">
+    <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/maxence-charriere/go-app/master/docs/web/icon.png">
+    <link rel="manifest" href="/manifest.webmanifest">
+    <link href="/app.css" type="text/css" rel="stylesheet">
+    <link href="/web/gameoflife.css" type="text/css" rel="stylesheet">
+    <script defer src="/wasm_exec.js"></script>
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <div>
+      <h1>Game of life</h1>
+      <button>Make Colony</button>
+      <hr>
+      <div>Generation: 0</div>
+      <div class="wrapper"></div>
+    </div>
+    <aside id="app-wasm-loader" class="goapp-app-info">
+      <img src="https://raw.githubusercontent.com/maxence-charriere/go-app/master/docs/web/icon.png" id="app-wasm-loader-icon" class="goapp-logo goapp-spin" alt="wasm loader icon">
+      <p id="app-wasm-loader-label" class="goapp-label">0%</p>
+    </aside>
+  </body>
+</html>

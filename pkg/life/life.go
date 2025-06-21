@@ -321,7 +321,6 @@ func (l *Life) insertGosperGliderGun(ctx app.Context) {
 }
 
 func (l *Life) setSpeed(ctx app.Context, ms int64) {
-	println("Setting speed to", ms, "ms")
 	if ms < 10 {
 		ms = 10
 	}

@@ -27,13 +27,15 @@ jobs:
         GOOS=js GOARCH=wasm go build -o web/app.wasm
 
     - name: Build
-      run: go build -o gameoflife -v ./...
+      run: go build -v ./...
 
     - name: Test
       run: go test -v ./...
 
     - name: Copy static files
-      run: CONWAYS_GAME_OF_LIFE_WEB_MODE=static ./gameoflife
+      run: |
+        go build
+        CONWAYS_GAME_OF_LIFE_WEB_MODE=static ./gameoflife
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v4

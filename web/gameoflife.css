@@ -1,6 +1,5 @@
 .wrapper {
     height: 100%;
-    /* If you change GridWidth/GridHeight in Go, update these too */
     grid-template: repeat(64, 17px) / repeat(64, 17px);
     grid-gap: 3px;
 }

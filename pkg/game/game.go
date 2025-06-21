@@ -110,6 +110,11 @@ func (g *Game) loadState(state string) {
 	err = dec.Decode(exp)
 	if err == nil {
 		g.tickInterval = 50 * time.Millisecond
+		if g.colony == nil {
+			g.colony = model.NewColony(len(exp.Cells[0]), len(exp.Cells))
+		} else {
+			g.colony.Reset()
+		}
 		g.colony.SetCells(exp.Cells)
 		//g.Update()
 	}

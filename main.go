@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
-	"github.com/richardwooding/gameoflife/pkg/life"
+	"github.com/richardwooding/gameoflife/pkg/game"
 	"github.com/richardwooding/gameoflife/webmode"
 	"log"
 	"net/http"
@@ -15,7 +15,7 @@ import (
 func main() {
 
 	// Components routing:
-	app.RouteWithRegexp("/(.*)", func() app.Composer { return &life.Life{} })
+	app.RouteWithRegexp("/(.*)", func() app.Composer { return &game.Game{} })
 	app.RunWhenOnBrowser()
 
 	webMode := webmode.Live
@@ -29,8 +29,8 @@ func main() {
 	}
 
 	handler := &app.Handler{
-		Name:        "Conway's Game of Life",
-		Description: "A live demo of Conway's Game of Life.",
+		Name:        "Conway's Game of Game",
+		Description: "A live demo of Conway's Game of Game.",
 		Icon: app.Icon{
 			Default: "/web/logo.png",
 		},

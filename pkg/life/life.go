@@ -29,6 +29,7 @@ type exported struct {
 	Colony [][]bool
 }
 
+// newColony initializes a new colony with the given dimensions and resets the simulation state.
 func (l *Life) newColony(context app.Context, dx uint, dy uint) {
 	c := make([][]bool, dy)
 	for i := range c {
@@ -42,6 +43,7 @@ func (l *Life) newColony(context app.Context, dx uint, dy uint) {
 	l.saveState(context)
 }
 
+// count returns 1 if the cell at (x, y) is alive, 0 otherwise.
 func (l *Life) count(x int, y int) uint {
 	if x < 0 || y < 0 || x >= l.dx || y >= l.dy {
 		return 0
@@ -52,12 +54,14 @@ func (l *Life) count(x int, y int) uint {
 	return 0
 }
 
+// countNeighbours counts the alive neighbours of the cell at (x, y).
 func (l *Life) countNeighbours(x int, y int) uint {
 	return l.count(x-1, y-1) + l.count(x, y-1) + l.count(x+1, y-1) +
 		l.count(x-1, y) + l.count(x+1, y) +
 		l.count(x-1, y+1) + l.count(x, y+1) + l.count(x+1, y+1)
 }
 
+// generate computes the next generation of the colony based on the current state.
 func (l *Life) generate(ctx app.Context) {
 	ng := make([][]bool, l.dy)
 	for i := range ng {
@@ -75,12 +79,14 @@ func (l *Life) generate(ctx app.Context) {
 	ctx.Update()
 }
 
+// toggle toggles the alive state of the cell at (x, y) and saves the current state.
 func (l *Life) toggle(context app.Context, x int, y int) {
 	(*l.colony)[y][x] = !(*l.colony)[y][x]
 	l.saveState(context)
 	//l.Update()
 }
 
+// className returns the CSS class name ("alive" or "dead") for the cell at (x, y).
 func (l *Life) className(x int, y int) string {
 	if (*l.colony)[y][x] {
 		return "alive"
@@ -89,6 +95,7 @@ func (l *Life) className(x int, y int) string {
 	}
 }
 
+// startTicking starts the simulation ticker with the current tick interval.
 func (l *Life) startTicking(ctx app.Context) {
 	if l.tickInterval == 0 {
 		l.tickInterval = 50 * time.Millisecond
@@ -107,12 +114,14 @@ func (l *Life) startTicking(ctx app.Context) {
 	})
 }
 
+// stopTicking stops the simulation ticker and saves the current state.
 func (l *Life) stopTicking(ctx app.Context) {
 	l.ticker.Stop()
 	l.ticker = nil
 	l.saveState(ctx)
 }
 
+// OnNav loads the simulation state from the URL path if present.
 func (l *Life) OnNav(ctx app.Context) {
 	path := ctx.Page().URL().Path
 	if path != "/" && path != "/gameoflife/" {
@@ -120,6 +129,7 @@ func (l *Life) OnNav(ctx app.Context) {
 	}
 }
 
+// OnMount is called when the component is mounted. (Implementation may be added as needed.)
 func (l *Life) OnMount(ctx app.Context) {
 	fragment := ctx.Page().URL().Fragment
 	if fragment != "" {
@@ -127,6 +137,7 @@ func (l *Life) OnMount(ctx app.Context) {
 	}
 }
 
+// loadState decodes and loads the simulation state from a base64-encoded string.
 func (l *Life) loadState(state string) {
 	exp := &exported{}
 	b, err := base64.RawURLEncoding.DecodeString(state)
@@ -147,6 +158,7 @@ func (l *Life) loadState(state string) {
 	}
 }
 
+// saveState encodes and saves the current simulation state as a base64-encoded string in the URL.
 func (l *Life) saveState(context app.Context) {
 	exp := exported{Colony: *l.colony}
 	var buff bytes.Buffer
@@ -166,6 +178,7 @@ func (l *Life) saveState(context app.Context) {
 	context.Page().ReplaceURL(context.Page().URL().ResolveReference(newUrl))
 }
 
+// clearColony clears the colony, resetting all cells to dead.
 func (l *Life) clearColony(ctx app.Context) {
 	if l.colony == nil {
 		return
@@ -179,6 +192,7 @@ func (l *Life) clearColony(ctx app.Context) {
 	l.saveState(ctx)
 }
 
+// insertGlider inserts a glider pattern at the top-left corner of the colony.
 func (l *Life) insertGlider(ctx app.Context) {
 	if l.colony == nil || l.dx < 3 || l.dy < 3 {
 		return
@@ -199,6 +213,7 @@ func (l *Life) insertGlider(ctx app.Context) {
 	ctx.Update()
 }
 
+// insertBlinker inserts a blinker pattern at the center of the colony.
 func (l *Life) insertBlinker(ctx app.Context) {
 	if l.colony == nil || l.dx < 5 || l.dy < 5 {
 		return
@@ -215,6 +230,7 @@ func (l *Life) insertBlinker(ctx app.Context) {
 	ctx.Update()
 }
 
+// insertPulsar inserts a pulsar pattern at the specified location in the colony.
 func (l *Life) insertPulsar(ctx app.Context) {
 	if l.colony == nil || l.dx < 9 || l.dy < 9 {
 		return
@@ -242,6 +258,7 @@ func (l *Life) insertPulsar(ctx app.Context) {
 	ctx.Update()
 }
 
+// insertToad inserts a toad pattern at the specified location in the colony.
 func (l *Life) insertToad(ctx app.Context) {
 	if l.colony == nil || l.dx < 6 || l.dy < 6 {
 		return
@@ -261,6 +278,7 @@ func (l *Life) insertToad(ctx app.Context) {
 	ctx.Update()
 }
 
+// insertBeacon inserts a beacon pattern at the specified location in the colony.
 func (l *Life) insertBeacon(ctx app.Context) {
 	if l.colony == nil || l.dx < 6 || l.dy < 6 {
 		return
@@ -282,6 +300,7 @@ func (l *Life) insertBeacon(ctx app.Context) {
 	ctx.Update()
 }
 
+// insertAcorn inserts an acorn pattern at the specified location in the colony.
 func (l *Life) insertAcorn(ctx app.Context) {
 	if l.colony == nil || l.dx < 10 || l.dy < 10 {
 		return
@@ -302,6 +321,7 @@ func (l *Life) insertAcorn(ctx app.Context) {
 	ctx.Update()
 }
 
+// insertGosperGliderGun inserts a Gosper Glider Gun pattern at the specified location in the colony.
 func (l *Life) insertGosperGliderGun(ctx app.Context) {
 	if l.colony == nil || l.dx < 40 || l.dy < 11 {
 		return
@@ -326,6 +346,7 @@ func (l *Life) insertGosperGliderGun(ctx app.Context) {
 	ctx.Update()
 }
 
+// setSpeed adjusts the simulation speed and restarts the ticker with the new interval.
 func (l *Life) setSpeed(ctx app.Context, ms int64) {
 	if ms < 10 {
 		ms = 10
@@ -340,6 +361,7 @@ func (l *Life) setSpeed(ctx app.Context, ms int64) {
 	}
 }
 
+// Render generates the UI for the Game of Life component.
 func (l *Life) Render() app.UI {
 
 	var colony [][]bool

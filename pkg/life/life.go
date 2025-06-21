@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"github.com/enescakir/emoji"
 	"github.com/maxence-charriere/go-app/v10/pkg/app"
+	"math/rand"
 	"net/url"
 	"strconv"
 	"strings"
@@ -456,6 +457,11 @@ func (l *Life) Render() app.UI {
 						l.insertGosperGliderGun(ctx)
 					}
 				}),
+				app.Button().Textf("%s Random", emoji.GameDie).OnClick(func(ctx app.Context, e app.Event) {
+					if l.colony != nil && l.ticker == nil {
+						l.insertRandom(ctx)
+					}
+				}),
 			)
 		}),
 		app.Hr(),
@@ -472,4 +478,16 @@ func (l *Life) Render() app.UI {
 			}),
 		),
 	)
+}
+
+func (l *Life) insertRandom(ctx app.Context) {
+	source := rand.NewSource(time.Now().UnixNano())
+	r := rand.New(source)
+	for y := 0; y < l.dy; y++ {
+		for x := 0; x < l.dx; x++ {
+			(*l.colony)[y][x] = r.Int()%2 == 0
+		}
+	}
+	l.generation = 0
+	l.saveState(ctx)
 }

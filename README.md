@@ -14,7 +14,7 @@ This project implements [Conway's Game of Life](https://en.wikipedia.org/wiki/Co
 
 ### Prerequisites
 
-- Go 1.18 or later
+- Go 1.24 or later
 
 ### Installation
 

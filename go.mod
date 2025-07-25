@@ -3,13 +3,13 @@ module github.com/richardwooding/gameoflife
 go 1.24
 
 require (
+	github.com/cucumber/godog v0.15.0
 	github.com/enescakir/emoji v1.0.0
-	github.com/maxence-charriere/go-app/v10 v10.1.3
+	github.com/maxence-charriere/go-app/v10 v10.1.4
 )
 
 require (
 	github.com/cucumber/gherkin/go/v26 v26.2.0 // indirect
-	github.com/cucumber/godog v0.15.0 // indirect
 	github.com/cucumber/messages/go/v21 v21.0.1 // indirect
 	github.com/gofrs/uuid v4.3.1+incompatible // indirect
 	github.com/google/uuid v1.6.0 // indirect

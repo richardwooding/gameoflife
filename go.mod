@@ -5,7 +5,7 @@ go 1.24
 require (
 	github.com/cucumber/godog v0.15.0
 	github.com/enescakir/emoji v1.0.0
-	github.com/maxence-charriere/go-app/v10 v10.1.4
+	github.com/maxence-charriere/go-app/v10 v10.1.5
 )
 
 require (

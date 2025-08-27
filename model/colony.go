@@ -24,7 +24,7 @@ func NewColony(dx, dy int) *Colony {
 
 func (c *Colony) SetCells(cells [][]bool) {
 	c.dy = len(cells)
-	c.dy = len(cells[0])
+	c.dx = len(cells[0])
 	c.cells = &cells
 }
 

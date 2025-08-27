@@ -3,7 +3,7 @@ module github.com/richardwooding/gameoflife
 go 1.24
 
 require (
-	github.com/cucumber/godog v0.15.0
+	github.com/cucumber/godog v0.15.1
 	github.com/enescakir/emoji v1.0.0
 	github.com/maxence-charriere/go-app/v10 v10.1.5
 )
@@ -16,5 +16,5 @@ require (
 	github.com/hashicorp/go-immutable-radix v1.3.1 // indirect
 	github.com/hashicorp/go-memdb v1.3.4 // indirect
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
-	github.com/spf13/pflag v1.0.5 // indirect
+	github.com/spf13/pflag v1.0.7 // indirect
 )
